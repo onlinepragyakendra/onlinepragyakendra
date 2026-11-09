@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  RETAILER
+  DISTRIBUTOR
+  ADMIN
+}
+
+enum TxnType {
+  CREDIT
+  DEBIT
+}
+
+enum TxnStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REVERSED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?  @unique
+  mobile       String   @unique
+  passwordHash String
+  role         Role     @default(CUSTOMER)
+  isActive     Boolean  @default(true)
+  kycStatus    String   @default("NOT_SUBMITTED")
+  parentId     String?
+  parent       User?    @relation("UserHierarchy", fields: [parentId], references: [id])
+  children     User[]   @relation("UserHierarchy")
+  wallet       Wallet?
+  transactions Transaction[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(0) // paise; never use floating-point currency
+  user      User     @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id             String    @id @default(cuid())
+  userId         String
+  type           TxnType
+  status         TxnStatus @default(PENDING)
+  amount         Int       // paise
+  reference      String    @unique
+  description    String
+  provider       String?
+  providerTxnId  String?
+  user           User      @relation(fields: [userId], references: [id])
+  createdAt      DateTime  @default(now())
+  @@index([userId, createdAt])
+}
+
+model ServiceRequest {
+  id          String    @id @default(cuid())
+  userId      String
+  serviceCode String
+  inputData   Json
+  status      TxnStatus @default(PENDING)
+  providerRef String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@index([userId, createdAt])
+}

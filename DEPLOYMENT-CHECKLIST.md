@@ -1,0 +1,11 @@
+# Launch checklist
+- [ ] Domain and HTTPS configured
+- [ ] PostgreSQL production database and automated backups
+- [ ] Strong JWT secret and Razorpay live keys stored as server secrets
+- [ ] Razorpay webhook configured and tested in test mode
+- [ ] OTP provider and abuse/rate limiting configured
+- [ ] Admin MFA and admin approval workflows completed
+- [ ] Service provider contracts, API documentation and production credentials obtained
+- [ ] Provider callbacks, refund/reversal and reconciliation tested
+- [ ] Privacy policy, terms, refund policy and grievance contact published
+- [ ] Security review and production deployment completed
